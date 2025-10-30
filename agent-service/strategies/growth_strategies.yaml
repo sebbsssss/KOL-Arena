@@ -1,0 +1,88 @@
+# Growth Strategies Knowledge Base for Web3 and Web2
+# This file defines reusable playbooks the agent can select from.
+
+web3:
+  reply_guy_ct:
+    objective: "Increase visibility on Crypto Twitter by value-adding in replies to key voices."
+    ideal_targets:
+      - "founders and CTOs of L1/L2/infra protocols"
+      - "on-chain analysts and market commentators"
+      - "DeFi protocol accounts and research firms"
+      - "high-signal traders with strong engagement-to-follower ratios"
+    discovery_topics:
+      - "Bitcoin, Ethereum, Solana, DeFi, RWA, L2s, MEV"
+      - "airdrop/meta discussions, ETF, macro, stablecoins"
+    heuristics:
+      min_followers: 10000
+      min_avg_engagement: 50  # likes+replies+retweets per tweet (rolling avg)
+      engagement_to_followers_ratio: 0.003  # 0.3%+
+      recency_hours: 12
+    reply_angles:
+      - "add one data point or source that the OP missed"
+      - "distill a complex claim into a crisp takeaway"
+      - "offer a polite counterpoint with logic and an example"
+      - "ask a smart follow-up question that invites further discussion"
+    guardrails:
+      - "never shill or drop links unless explicitly relevant"
+      - "be respectful; no dogpiling or ad hominem"
+      - "avoid repetitive one-liners; provide unique value"
+    cadence:
+      max_replies_per_day: 20
+      per_target_daily_limit: 2
+      cooldown_minutes_same_target: 60
+
+  thought_leadership_threads:
+    objective: "Build authority via short threads with original insights."
+    components:
+      - hook
+      - 2-4 insight bullets with examples
+      - source or data reference
+      - invitation to discuss
+    cadence:
+      per_week: 2
+
+  news_arb_commentary:
+    objective: "Capitalize on breaking news with fast, factual commentary."
+    sources:
+      - "x_trending"
+      - "coindesk"
+      - "cryptopanic"
+    sla_minutes: 15
+
+web2:
+  linkedin_value_comments:
+    objective: "Piggyback reach on LinkedIn by early, helpful comments on top creators."
+    ideal_targets:
+      - "operators, PMs, growth leaders"
+    heuristics:
+      min_followers: 10000
+      min_avg_comments: 30
+      recency_hours: 24
+    angles:
+      - "add a metric, framework, or counter-example"
+      - "share a compact checklist"
+    cadence:
+      per_day: 10
+
+  short_form_crosspost:
+    objective: "Produce short-form and cross-post (X, TikTok, Shorts, Reels)."
+    pillars:
+      - "tactical tips"
+      - "myths vs reality"
+      - "case studies"
+    cadence:
+      per_week: 3
+
+shared:
+  ethical_safety:
+    - "no financial advice; include disclaimers where appropriate"
+    - "no harassment; focus on ideas, not people"
+    - "avoid misinformation; cite when making claims"
+  evaluation:
+    north_star: "meaningful engagement growth (quality replies, follows, DMs)"
+    metrics:
+      - "reply acceptance rate (likes/replies per reply)"
+      - "follows from targets per week"
+      - "engagement-to-follower ratio of engaged accounts"
+
+

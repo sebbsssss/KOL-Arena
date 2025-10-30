@@ -3,6 +3,9 @@ import yaml
 import random
 from datetime import datetime, timedelta
 from typing import Dict, List, Any
+from strategies.loader import load_growth_strategies, get_playbook
+from strategies.selector import choose_reply_angles
+from x_discovery import XDiscovery
 from llm_clients import get_llm_client
 from x_client import XClient
 
@@ -23,6 +26,7 @@ class EnhancedAIAgent:
         self.personality = config["personality"]
         self.system_prompt = config["system_prompt"]
         self.strategy = config["strategy"]
+        self.engagement = config.get("engagement", {})
         
         # Initialize clients
         self.llm_client = get_llm_client(self.llm_provider)
@@ -32,6 +36,15 @@ class EnhancedAIAgent:
             access_token=os.getenv(f"{self.id.upper()}_X_ACCESS_TOKEN"),
             access_token_secret=os.getenv(f"{self.id.upper()}_X_ACCESS_TOKEN_SECRET")
         )
+        self.discovery = XDiscovery(self.x_client)
+        self.strategies_kb = load_growth_strategies()
+        self.playbook = None
+        try:
+            domain = self.engagement.get("domain", "web3")
+            playbook_key = self.engagement.get("playbook", "reply_guy_ct")
+            self.playbook = get_playbook(self.strategies_kb, domain, playbook_key)
+        except Exception:
+            self.playbook = None
         
         # Memory and performance tracking
         self.memory = []
@@ -41,6 +54,7 @@ class EnhancedAIAgent:
             "total_engagement": 0,
             "best_performing_type": None
         }
+        self.recent_replies: List[Dict[str, Any]] = []
     
     def decide_action(self, context: Dict[str, Any]) -> str:
         """
@@ -159,6 +173,96 @@ Generate the tweet now:
             tweet_content = tweet_content[:277] + "..."
         
         return tweet_content
+
+    def should_reply_now(self) -> bool:
+        """
+        Basic frequency control for replies using engagement settings.
+        """
+        cap = int(self.engagement.get("daily_reply_cap", 10))
+        cutoff = datetime.now() - timedelta(hours=24)
+        recent = [r for r in self.recent_replies if r["timestamp"] > cutoff]
+        return len(recent) < cap
+
+    def find_reply_opportunities(self) -> List[Dict[str, Any]]:
+        """
+        Use discovery to find top accounts and return recent tweets to reply to.
+        """
+        if not self.playbook:
+            return []
+        topics = self.engagement.get("topics", ["Bitcoin", "Ethereum", "DeFi"])
+        heur = self.playbook.get("heuristics", {})
+        candidates = self.discovery.search_and_rank_accounts(
+            topics=topics,
+            min_followers=int(heur.get("min_followers", 10000)),
+            min_avg_engagement=int(heur.get("min_avg_engagement", 50)),
+            engagement_to_followers_ratio=float(heur.get("engagement_to_followers_ratio", 0.003)),
+            recency_hours=int(heur.get("recency_hours", 12)),
+            limit=20,
+        )
+        opportunities: List[Dict[str, Any]] = []
+        for c in candidates[:10]:
+            # Fetch a recent tweet to reply to
+            tweets = self.x_client.get_user_tweets(user_id=c.user_id, max_results=3)
+            if not tweets:
+                continue
+            target_tweet = tweets[0]
+            opportunities.append({
+                "target_user": c,
+                "tweet": target_tweet,
+            })
+        return opportunities
+
+    def generate_reply_content(self, target_tweet: Dict[str, Any]) -> str:
+        if not self.playbook:
+            return ""
+        angles = choose_reply_angles(self.playbook, k=1)
+        angle = angles[0] if angles else "add one data point"
+        guardrails = "\n".join(f"- {g}" for g in self.playbook.get("guardrails", []))
+        tweet_text = target_tweet.get("text", "")
+        author = target_tweet.get("author", {}).get("username") or target_tweet.get("author_username", "")
+
+        user_prompt = f"""
+Target tweet (from @{author}):
+"""
+{tweet_text}
+"""
+
+Your task:
+- Write a concise, high-signal reply following this angle: {angle}
+- Stay under 200 characters. Be specific and useful.
+- Personality archetype: {self.personality['archetype']}
+- Tone: {self.personality['tone']}
+
+Guardrails:
+{guardrails}
+
+Reply:
+"""
+        reply = self.llm_client.generate_text(
+            system_prompt=self.system_prompt,
+            user_prompt=user_prompt,
+        ).strip()
+        if len(reply) > 240:
+            reply = reply[:237] + "..."
+        return reply
+
+    def reply_to_tweet(self, tweet: Dict[str, Any], content: str) -> bool:
+        try:
+            result = self.x_client.post_reply(tweet_id=tweet.get("id"), content=content)
+            if result:
+                self.recent_replies.append({
+                    "content": content,
+                    "timestamp": datetime.now(),
+                    "tweet_id": tweet.get("id"),
+                    "reply_id": result.get("id"),
+                })
+                # prune
+                cutoff = datetime.now() - timedelta(hours=24)
+                self.recent_replies = [r for r in self.recent_replies if r["timestamp"] > cutoff]
+                return True
+        except Exception as e:
+            print(f"[{self.name}] Error replying: {e}")
+        return False
     
     def should_post_now(self) -> bool:
         """
@@ -292,6 +396,17 @@ class AgentManager:
                 if success:
                     print(f"[{agent.name}] Posted: {content[:50]}...")
             else:
+                # Try engagement via replies if allowed
+                if agent.should_reply_now():
+                    opportunities = agent.find_reply_opportunities()
+                    if opportunities:
+                        opp = opportunities[0]
+                        reply_text = agent.generate_reply_content(opp["tweet"])
+                        if reply_text:
+                            ok = agent.reply_to_tweet(opp["tweet"], reply_text)
+                            if ok:
+                                print(f"[{agent.name}] Replied to @{opp['target_user'].username}: {reply_text[:50]}...")
+                                continue
                 print(f"[{agent.name}] Waiting for better opportunity...")
 
 

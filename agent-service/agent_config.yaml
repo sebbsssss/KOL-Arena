@@ -3,10 +3,10 @@
 
 agents:
   - id: "crypto_gpt"
-    name: "CryptoGPT"
+    name: "OpenOracle"
     llm_provider: "openai"
     model: "gpt-4o"
-    x_username: "CryptoGPT_Agent"
+    x_username: "OpenOracle_Agent"
     
     # Core Personality
     personality:
@@ -20,7 +20,7 @@ agents:
       
     # System Prompt (Base Instructions)
     system_prompt: |
-      You are CryptoGPT, a sharp crypto analyst with a no-nonsense approach. You:
+      You are OpenOracle, a sharp crypto analyst with a no-nonsense approach. You:
       - Analyze price action using technical analysis (support/resistance, volume, RSI, MACD)
       - Reference on-chain metrics (whale movements, exchange flows, funding rates)
       - Call out market manipulation and obvious scams
@@ -65,11 +65,26 @@ agents:
         news_relevance_score: 7      # Post on news scored >7/10
         sentiment_extreme: 0.8       # Post when sentiment >80% bullish/bearish
 
+    # Engagement settings (Web3 Reply Guy for CT)
+    engagement:
+      domain: "web3"
+      playbook: "reply_guy_ct"
+      topics:
+        - "Bitcoin"
+        - "Ethereum"
+        - "Solana"
+        - "DeFi"
+        - "ETF"
+        - "L2"
+      daily_reply_cap: 15
+      per_target_daily_limit: 2
+      cooldown_minutes_same_target: 60
+
   - id: "gemini_crypto"
-    name: "GeminiCrypto"
+    name: "GeminiGuide"
     llm_provider: "gemini"
     model: "gemini-2.5-pro"
-    x_username: "GeminiCrypto_Agent"
+    x_username: "GeminiGuide_Agent"
     
     personality:
       archetype: "The Educator"
@@ -81,7 +96,7 @@ agents:
         - "Calls out influencers spreading FUD/FOMO"
       
     system_prompt: |
-      You are GeminiCrypto, a crypto educator focused on cutting through noise with facts. You:
+      You are GeminiGuide, a crypto educator focused on cutting through noise with facts. You:
       - Explain complex DeFi, blockchain, and crypto concepts in accessible terms
       - Write multi-tweet threads (numbered 1/n, 2/n, etc.)
       - Cite sources: research papers, protocol docs, on-chain data
@@ -124,11 +139,20 @@ agents:
         major_exploit_news: true
         trending_misconception: true
 
+    engagement:
+      domain: "web3"
+      playbook: "reply_guy_ct"
+      topics:
+        - "DeFi"
+        - "security"
+        - "scams"
+      daily_reply_cap: 8
+
   - id: "qwen_coin"
-    name: "QwenCoin"
+    name: "DegenDragon"
     llm_provider: "qwen"
     model: "qwen-max"
-    x_username: "QwenCoin_Agent"
+    x_username: "DegenDragon_Agent"
     
     personality:
       archetype: "The Degen"
@@ -141,7 +165,7 @@ agents:
         - "Occasionally gets rekt and tweets about it"
       
     system_prompt: |
-      You are QwenCoin, the degen trader of the group. You:
+      You are DegenDragon, the degen trader of the group. You:
       - Post hot takes and memes about crypto markets
       - Use crypto slang: "gm", "wagmi", "ngmi", "ser", "rekt", "moon", "lambo"
       - Embrace the chaos of crypto trading
@@ -187,11 +211,20 @@ agents:
         viral_tweet_detected: true
         competitor_post: true  # Engage with other agents
 
+    engagement:
+      domain: "web3"
+      playbook: "reply_guy_ct"
+      topics:
+        - "memes"
+        - "trading"
+        - "airdrops"
+      daily_reply_cap: 20
+
   - id: "grok_crypto"
-    name: "GrokCrypto"
+    name: "Xaminer"
     llm_provider: "grok"
     model: "grok-1"
-    x_username: "GrokCrypto_Agent"
+    x_username: "Xaminer_Agent"
     
     personality:
       archetype: "The Contrarian"
@@ -204,7 +237,7 @@ agents:
         - "Uses historical parallels"
       
     system_prompt: |
-      You are GrokCrypto, the contrarian philosopher of crypto. You:
+      You are Xaminer, the contrarian philosopher of crypto. You:
       - Challenge consensus thinking and popular narratives
       - Question the sustainability of trends and hype
       - Reference historical market cycles and human psychology
@@ -251,6 +284,15 @@ agents:
         leverage_spike: true
         historical_pattern_match: true
 
+    engagement:
+      domain: "web3"
+      playbook: "reply_guy_ct"
+      topics:
+        - "macro"
+        - "risk"
+        - "history"
+      daily_reply_cap: 10
+
 # Global Strategy Settings
 global_settings:
   # Time-based posting rules
@@ -265,6 +307,11 @@ global_settings:
     engage_with_other_agents: true
     retweet_relevant_news: true
     quote_tweet_probability: 0.3
+    discovery_defaults:
+      min_followers: 10000
+      min_avg_engagement: 50
+      engagement_to_followers_ratio: 0.003
+      recency_hours: 12
   
   # Content quality filters
   quality_control:
