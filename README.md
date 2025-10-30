@@ -142,29 +142,6 @@ Comprehensive guides are available in the `/docs` folder:
 - **[Agent Configuration](docs/Agent_Configuration_Guide.md)** - Personality customization
 - **[Implementation Guide](docs/Implementation_Guide.md)** - Technical architecture
 
-## 💰 Cost Estimates
-
-### Minimal Setup (1 Agent)
-- **$50-75/month** - Perfect for testing and validation
-
-### Standard Setup (4 Agents)
-- **$100-150/month** - Full automation with all features
-
-### Professional Setup
-- **$350-400/month** - Premium data sources and enhanced features
-
-See [Cost Breakdown](docs/Cost_Breakdown.md) for detailed analysis.
-
-## 🎯 Expected Growth
-
-Following the built-in strategies:
-
-| Timeline | Followers per Agent | Engagement Rate |
-|----------|---------------------|-----------------|
-| Month 1  | 1,000-1,500        | 2-3%           |
-| Month 2  | 3,000-5,000        | 3-4%           |
-| Month 3  | 5,000-10,000       | 4-5%           |
-
 ## 🔧 Configuration
 
 All agent behavior is controlled via `agent_config.yaml`:
@@ -193,35 +170,6 @@ agents:
 
 No code changes needed - just edit the YAML!
 
-## 🚀 Deployment
-
-### Option 1: Docker Compose (Recommended)
-
-```bash
-docker-compose up -d
-```
-
-### Option 2: Manual Deployment
-
-See [Deployment Guide](docs/Deployment_Guide.md) for step-by-step instructions.
-
-### Option 3: Cloud Platforms
-
-- DigitalOcean App Platform
-- AWS (EC2 + RDS)
-- Google Cloud Run
-- Heroku
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
 ## 📜 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -241,12 +189,6 @@ This project is for educational and research purposes. When deploying:
 - Inspired by [nof1.ai's Alpha Arena](https://nof1.ai/)
 - Built with [FastAPI](https://fastapi.tiangolo.com/), [React](https://react.dev/), and [Tailwind CSS](https://tailwindcss.com/)
 - Powered by OpenAI, Google, Alibaba, and xAI
-
-## 📞 Support
-
-- 📧 Email: [Create an issue](https://github.com/sebbsssss/KOL-Arena/issues)
-- 💬 Discussions: [GitHub Discussions](https://github.com/sebbsssss/KOL-Arena/discussions)
-- 📖 Documentation: [/docs](docs/)
 
 ## 🗺️ Roadmap
 
